@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio de Sesión</title>
+</head>
+
+<body>
+
+    <div class="contenedor">
+        <h2>Inicio de Sesión</h2>
+
+        <!-- Mensaje de error desde JS -->
+        <p id="error"></p>
+
+        <!-- Formulario para iniciar sesión -->
+        <form action="inicio_sesion.php" method="POST" onsubmit="return validarLogin();">
+
+            <!-- Campo correo -->
+            <input type="email" id="correo" name="correo" placeholder="Correo" required>
+
+            <!-- Campo contraseña -->
+            <input type="password" id="contraseña" name="contraseña" placeholder="Contraseña" required>
+
+            <!-- Botón de enviar login -->
+            <button type="submit">Ingresar</button>
+        </form>
+
+        <!-- BOTÓN PARA IR AL REGISTRO -->
+        <a href="registro.html">
+            <button class="registro-btn">Registrarse</button>
+        </a>
+
+    </div>
+
+</body>
+
+<style>
+    /* Estilos generales de la página */
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    /* Contenedor principal del formulario */
+    .contenedor {
+        background: #fff;
+        padding: 25px;
+        width: 350px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px #0003;
+        text-align: center;
+    }
+
+    /* Campos de entrada */
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-top: 12px;
+        border-radius: 8px;
+        border: 1px solid #aaa;
+        box-sizing: border-box;
+    }
+
+    /* Botón principal (Ingresar) */
+    button {
+        width: 100%;
+        background: #007BFF;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        margin-top: 15px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    /* Hover del botón Ingresar */
+    button:hover {
+        background: #0056b3;
+    }
+
+    /* Botón de registro (segundo botón) */
+    .registro-btn {
+        background: #28a745;            /* verde */
+        margin-top: 10px;               /* separado del botón de arriba */
+    }
+
+    .registro-btn:hover {
+        background: #1e7e34;            /* verde oscuro */
+    }
+
+    /* Mensaje de error */
+    #error {
+        color: red;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+</style>
+
+<script>
+    // Función que valida el formulario antes de enviarlo
+    function validarLogin() {
+        let correo = document.getElementById("correo").value;
+        let contraseña = document.getElementById("contraseña").value;
+        let error = document.getElementById("error");
+
+        // Validar campos vacíos
+        if (correo.trim() === "" || contraseña.trim() === "") {
+            error.textContent = "Todos los campos son obligatorios.";
+            return false;
+        }
+
+        // Validación básica del formato del correo
+        let re = /\S+@\S+\.\S+/;
+        if (!re.test(correo)) {
+            error.textContent = "Ingresa un correo válido.";
+            return false;
+        }
+
+        // Si todo bien, limpiar error y permitir envío
+        error.textContent = "";
+        return true;
+    }
+</script>
+
+</html>

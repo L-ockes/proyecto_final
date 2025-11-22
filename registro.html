@@ -3,129 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <title>Registro de Emprendedores</title>
-
-    <style>
-        body {
-            background: #eef1f5;
-            font-family: Arial, sans-serif;
-        }
-        form {
-            background: white;
-            max-width: 450px;
-            margin: 40px auto;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #0003;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        label {
-            font-weight: bold;
-            margin-top: 10px;
-            display: block;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            margin-top: 5px;
-            border-radius: 6px;
-            border: 1px solid #777;
-        }
-        button {
-            margin-top: 15px;
-            width: 100%;
-            padding: 12px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-
-        .mensaje {
-            margin-top: 15px;
-            padding: 12px;
-            text-align: center;
-            border-radius: 6px;
-            font-weight: bold;
-            display: none;
-        }
-        .ok { background: #c3f3c3; color: green; }
-        .error { background: #f3c3c3; color: red; }
-    </style>
 </head>
 
 <body>
 
-<form id="formRegistro">
-    <h2>Registrar Emprendimiento</h2>
+    <div class="contenedor">
+        <h2>Registrar Emprendimiento</h2>
 
-    <div id="mensaje" class="mensaje"></div>
+        <!-- Mensaje de error desde JS -->
+        <p id="error"></p>
 
-    <label>Nombre del Emprendimiento</label>
-    <input type="text" id="nombre" required>
+        <!-- Formulario de registro -->
+        <form action="registro.php" method="POST" onsubmit="return validarRegistro();">
 
-    <label>Categoría</label>
-    <select id="categoria" required>
-        <option value="Gastronomía">Gastronomía</option>
-        <option value="Artesanías">Artesanías</option>
-        <option value="Turismo">Turismo</option>
-        <option value="Transporte">Transporte</option>
-        <option value="Otros">Otros</option>
-    </select>
+            <!-- Nombre del emprendimiento -->
+            <input type="text" id="nombre_emprendimiento" name="nombre_emprendimiento" placeholder="Nombre del emprendimiento" required>
 
-    <label>Descripción</label>
-    <textarea id="descripcion" required></textarea>
+            <!-- Categoría -->
+            <input type="text" id="categoria" name="categoria" placeholder="Categoría" required>
 
-    <label>Dirección</label>
-    <input type="text" id="direccion" required>
+            <!-- Descripción -->
+            <input type="text" id="descripcion" name="descripcion" placeholder="Descripción del negocio" required>
 
-    <label>Teléfono</label>
-    <input type="text" id="telefono" required>
+            <!-- Ubicación -->
+            <input type="text" id="ubicacion" name="ubicacion" placeholder="Ubicación" required>
 
-    <label>Correo</label>
-    <input type="email" id="correo" required>
+            <!-- Nombre del propietario -->
+            <input type="text" id="nombre_propietario" name="nombre_propietario" placeholder="Nombre del propietario" required>
 
-    <button type="submit">Registrar</button>
-</form>
+            <!-- Teléfono -->
+            <input type="text" id="telefono" name="telefono" placeholder="Teléfono" required>
 
-<script>
-document.getElementById("formRegistro").addEventListener("submit", function(e){
-    e.preventDefault();
+            <!-- Correo -->
+            <input type="email" id="correo" name="correo" placeholder="Correo" required>
 
-    let datos = new FormData();
-    datos.append("nombre", document.getElementById("nombre").value);
-    datos.append("categoria", document.getElementById("categoria").value);
-    datos.append("descripcion", document.getElementById("descripcion").value);
-    datos.append("direccion", document.getElementById("direccion").value);
-    datos.append("telefono", document.getElementById("telefono").value);
-    datos.append("correo", document.getElementById("correo").value);
+            <!-- CONTRASEÑA — Aquí lo que te faltaba -->
+            <input type="password" id="contraseña" name="contraseña" placeholder="Contraseña" required>
 
-    fetch("registro.php", {
-        method: "POST",
-        body: datos
-    })
-    .then(res => res.text())
-    .then(data => {
-        let mensaje = document.getElementById("mensaje");
-        mensaje.style.display = "block";
-        mensaje.innerHTML = data;
+            <!-- Botón registrar -->
+            <button type="submit">Registrar</button>
+        </form>
 
-        if (data.includes("exitoso")) {
-            mensaje.className = "mensaje ok";
-            document.getElementById("formRegistro").reset();
-        } else {
-            mensaje.className = "mensaje error";
-        }
-    });
-});
-</script>
+        <!-- Botón que lleva al inicio de sesión -->
+        <a href="inicio_sesion.html">
+            <button class="login-btn">¿Ya tienes cuenta? Inicia sesión</button>
+        </a>
+
+    </div>
 
 </body>
+
+<style>
+    /* Estilos generales */
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    /* Contenedor del formulario */
+    .contenedor {
+        background: #fff;
+        padding: 25px;
+        width: 380px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px #0003;
+        text-align: center;
+    }
+
+    /* Campos del formulario */
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-top: 12px;
+        border-radius: 8px;
+        border: 1px solid #aaa;
+        box-sizing: border-box;
+    }
+
+    /* Botón principal */
+    button {
+        width: 100%;
+        background: #28a745;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        margin-top: 15px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background: #1e7e34;
+    }
+
+    /* Botón de iniciar sesión */
+    .login-btn {
+        background: #007BFF;
+        margin-top: 10px;
+    }
+
+    .login-btn:hover {
+        background: #0056b3;
+    }
+
+    /* Mensaje de error */
+    #error {
+        color: red;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+</style>
+
+<script>
+    // Validación del formulario de registro
+    function validarRegistro() {
+        let correo = document.getElementById("correo").value;
+        let telefono = document.getElementById("telefono").value;
+        let contraseña = document.getElementById("contraseña").value;
+        let error = document.getElementById("error");
+
+        // Validar formato del correo
+        let re = /\S+@\S+\.\S+/;
+        if (!re.test(correo)) {
+            error.textContent = "Ingresa un correo válido.";
+            return false;
+        }
+
+        // Validar teléfono numérico
+        if (isNaN(telefono)) {
+            error.textContent = "El teléfono solo debe tener números.";
+            return false;
+        }
+
+        // Validar longitud de contraseña
+        if (contraseña.length < 4) {
+            error.textContent = "La contraseña debe tener al menos 4 caracteres.";
+            return false;
+        }
+
+        error.textContent = "";
+        return true;
+    }
+</script>
+
 </html>
