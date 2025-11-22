@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Emprendedores</title>
+
+    <style>
+        body {
+            background: #eef1f5;
+            font-family: Arial, sans-serif;
+        }
+        form {
+            background: white;
+            max-width: 450px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #0003;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #777;
+        }
+        button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+
+        .mensaje {
+            margin-top: 15px;
+            padding: 12px;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: bold;
+            display: none;
+        }
+        .ok { background: #c3f3c3; color: green; }
+        .error { background: #f3c3c3; color: red; }
+    </style>
+</head>
+
+<body>
+
+<form id="formRegistro">
+    <h2>Registrar Emprendimiento</h2>
+
+    <div id="mensaje" class="mensaje"></div>
+
+    <label>Nombre del Emprendimiento</label>
+    <input type="text" id="nombre" required>
+
+    <label>Categoría</label>
+    <select id="categoria" required>
+        <option value="Gastronomía">Gastronomía</option>
+        <option value="Artesanías">Artesanías</option>
+        <option value="Turismo">Turismo</option>
+        <option value="Transporte">Transporte</option>
+        <option value="Otros">Otros</option>
+    </select>
+
+    <label>Descripción</label>
+    <textarea id="descripcion" required></textarea>
+
+    <label>Dirección</label>
+    <input type="text" id="direccion" required>
+
+    <label>Teléfono</label>
+    <input type="text" id="telefono" required>
+
+    <label>Correo</label>
+    <input type="email" id="correo" required>
+
+    <button type="submit">Registrar</button>
+</form>
+
+<script>
+document.getElementById("formRegistro").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    let datos = new FormData();
+    datos.append("nombre", document.getElementById("nombre").value);
+    datos.append("categoria", document.getElementById("categoria").value);
+    datos.append("descripcion", document.getElementById("descripcion").value);
+    datos.append("direccion", document.getElementById("direccion").value);
+    datos.append("telefono", document.getElementById("telefono").value);
+    datos.append("correo", document.getElementById("correo").value);
+
+    fetch("registro.php", {
+        method: "POST",
+        body: datos
+    })
+    .then(res => res.text())
+    .then(data => {
+        let mensaje = document.getElementById("mensaje");
+        mensaje.style.display = "block";
+        mensaje.innerHTML = data;
+
+        if (data.includes("exitoso")) {
+            mensaje.className = "mensaje ok";
+            document.getElementById("formRegistro").reset();
+        } else {
+            mensaje.className = "mensaje error";
+        }
+    });
+});
+</script>
+
+</body>
+</html>
