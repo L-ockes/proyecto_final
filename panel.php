@@ -135,6 +135,19 @@ $datos = $resultado->fetch_assoc();
                         <?php echo $datos["descripcion"]; ?>
                     </p>
 
+                    <p><strong>Horarios:</strong><br><?php echo $datos["horarios"]; ?></p>
+
+                    <p><strong>Servicios ofrecidos:</strong><br>
+                        <?php echo $datos["servicios"]; ?>
+                    </p>
+
+                    <?php if (!empty($datos["servicios_extra"])): ?>
+                    <p><strong>Servicios adicionales:</strong><br>
+                        <?php echo $datos["servicios_extra"]; ?>
+                    </p>
+                    <?php endif; ?>
+
+
                     <!-- BOTONES DE ACCIÓN GRANDES -->
                     <div class="row mt-4">
 

@@ -1,86 +1,90 @@
 <?php
-// Iniciar sesión para validar que el usuario esté logueado
 session_start();
 
-// Si no hay sesión, redirigir al login
+// Verificar que haya sesión
 if (!isset($_SESSION["id"])) {
     header("Location: inicio_sesion.php");
     exit();
 }
 
-// Conexión a la base de datos
+// Conexión
 $conexion = new mysqli("localhost", "root", "", "visita_quibdo");
 
-// Verificar si hay error al conectar
 if ($conexion->connect_error) {
-    die("Error de conexión: " . $conexion->connect_error);
+    die("Error en la conexión: " . $conexion->connect_error);
 }
 
-// Recibir datos del formulario
-$id = $_POST['id']; // ID del emprendimiento
+$id = $_SESSION["id"];
+
+// =======================
+// 1. Obtener datos del formulario
+// =======================
+
 $nombre_emprendimiento = $_POST['nombre_emprendimiento'];
 $categoria = $_POST['categoria'];
 $descripcion = $_POST['descripcion'];
 $ubicacion = $_POST['ubicacion'];
-$nombre_propietario = $_POST['nombre_propietario'];
-$telefono = $_POST['telefono'];
-$correo = $_POST['correo'];
+$horarios = $_POST['horarios'];
 
-// Primero, traemos los datos actuales para obtener la foto anterior
-$sqlActual = "SELECT foto FROM emprendedores WHERE id = '$id'";
-$resultadoActual = $conexion->query($sqlActual);
-$datosActuales = $resultadoActual->fetch_assoc();
-$fotoActual = $datosActuales["foto"]; // Guardamos la ruta de la foto vieja
+// Convertir servicios marcados en texto
+$servicios = isset($_POST["servicios"]) ? implode(", ", $_POST["servicios"]) : "";
+$servicios_extra = $_POST["servicios_extra"];
 
-// Empezamos con la foto nueva como la misma de antes
-$nuevaFoto = $fotoActual;
+$nombre_propietario = $_POST['nombre_propietario'] ?? "";
+$telefono = $_POST['telefono'] ?? "";
+$correo = $_POST['correo'] ?? "";
+$contraseña = $_POST['contraseña'] ?? "";  // (si lo estás editando aquí)
 
-// Revisamos si el usuario subió una nueva foto
+
+// =======================
+// 2. Manejo de la foto
+// =======================
+
+// Primero obtenemos la foto actual
+$sqlFoto = "SELECT foto FROM emprendedores WHERE id='$id'";
+$resultFoto = $conexion->query($sqlFoto);
+$datosFoto = $resultFoto->fetch_assoc();
+$fotoActual = $datosFoto["foto"];
+
+$nuevaFoto = $fotoActual; // Por defecto, conservar la foto actual
+
+// Si subió una nueva imagen
 if (isset($_FILES["foto"]) && $_FILES["foto"]["error"] === 0) {
-    
-    // Creamos un nombre único para la imagen
+
+    // Crear nombre único
     $nombreImagen = time() . "_" . basename($_FILES["foto"]["name"]);
-    
-    // Carpeta de destino
     $rutaDestino = "fotos/" . $nombreImagen;
 
-    // Movemos la nueva imagen subida
+    // Mover imagen
     if (move_uploaded_file($_FILES["foto"]["tmp_name"], $rutaDestino)) {
-
-        // Si se movió bien, actualizamos la variable de la nueva foto
         $nuevaFoto = $rutaDestino;
-
-        // Si había una foto anterior, la podemos borrar (opcional)
-        if (!empty($fotoActual) && file_exists($fotoActual)) {
-            // unlink($fotoActual); // Descomentar si quieres borrar la foto vieja
-        }
     }
 }
 
-// Armamos el UPDATE para guardar cambios
-$sqlUpdate = "UPDATE emprendedores SET 
-    nombre_emprendimiento = '$nombre_emprendimiento',
-    categoria = '$categoria',
-    descripcion = '$descripcion',
-    ubicacion = '$ubicacion',
-    nombre_propietario = '$nombre_propietario',
-    telefono = '$telefono',
-    correo = '$correo',
-    foto = '$nuevaFoto'
-    WHERE id = '$id'";
 
-// Ejecutamos el UPDATE
-if ($conexion->query($sqlUpdate) === TRUE) {
-    // Si todo salió bien, avisamos y mandamos al panel
+// =======================
+// 3. Actualizar datos en la base de datos
+// =======================
+
+$sql = "UPDATE emprendedores SET
+        nombre_emprendimiento = '$nombre_emprendimiento',
+        categoria = '$categoria',
+        descripcion = '$descripcion',
+        ubicacion = '$ubicacion',
+        horarios = '$horarios',
+        servicios = '$servicios',
+        servicios_extra = '$servicios_extra',
+        foto = '$nuevaFoto'
+        WHERE id = '$id'";
+
+if ($conexion->query($sql)) {
     echo "<script>
-            alert('Cambios guardados correctamente.');
-            window.location.href = 'panel.php';
+            alert('Cambios guardados correctamente');
+            window.location = 'panel.php';
           </script>";
 } else {
-    // Si hay error, lo mostramos
     echo "Error al actualizar: " . $conexion->error;
 }
 
-// Cerramos la conexión
 $conexion->close();
 ?>

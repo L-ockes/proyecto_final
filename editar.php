@@ -1,170 +1,122 @@
 <?php
-// Iniciar la sesión para saber qué usuario está logueado
 session_start();
 
-// Si NO hay usuario en sesión, lo mandamos al inicio de sesión
+// Si no hay usuario logueado, redirigir
 if (!isset($_SESSION["id"])) {
-    header("Location: inicio_sesion.php"); // Redirige al login si no está logueado
-    exit(); // Detiene el código
+    header("Location: inicio_sesion.php");
+    exit();
 }
 
-// Conectamos a la base de datos
 $conexion = new mysqli("localhost", "root", "", "visita_quibdo");
 
-// Si hay error en la conexión, mostramos mensaje y paramos
 if ($conexion->connect_error) {
-    die("Error de conexión: " . $conexion->connect_error);
+    die("Error: " . $conexion->connect_error);
 }
 
-// Guardamos el id del usuario logueado
-$idUsuario = $_SESSION["id"];
+$id = $_SESSION["id"];
 
-// Buscamos el emprendimiento de ese usuario
-$sql = "SELECT * FROM emprendedores WHERE id = '$idUsuario'";
+// Obtener datos actuales
+$sql = "SELECT * FROM emprendedores WHERE id='$id'";
 $resultado = $conexion->query($sql);
-
-// Si no se encuentra, mostramos error simple
-if ($resultado->num_rows == 0) {
-    die("No se encontró el emprendimiento del usuario.");
-}
-
-// Guardamos los datos en un arreglo
 $datos = $resultado->fetch_assoc();
+
+// Convertir servicios en arreglo para marcar checkbox
+$servicios_guardados = explode(", ", $datos["servicios"]);
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Definimos que la página está en español y codificación UTF-8 -->
     <meta charset="UTF-8">
-    <!-- Título de la pestaña del navegador -->
     <title>Editar Emprendimiento</title>
 
-    <!-- CSS de Bootstrap para estilos rápidos y responsivos -->
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Iconos de Font Awesome para los botones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- Tus estilos personalizados -->
-    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-light">
 
-    <!-- Incluimos el menú superior -->
-    <?php include("includes/navbar.php"); ?>
+<body>
 
-    <!-- Contenedor principal -->
-    <div class="container mt-5">
-        <!-- Título centrado -->
-        <h2 class="text-center text-primary fw-bold mb-4">Editar mi Emprendimiento</h2>
+<?php include("includes/navbar.php"); ?>
 
-        <!-- Tarjeta que contiene el formulario -->
-        <div class="card shadow-lg">
-            <!-- Encabezado de la tarjeta -->
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Actualiza tus datos</h4>
-            </div>
+<div class="container mt-5">
+    <h2 class="text-primary fw-bold mb-4 text-center">Editar Mi Emprendimiento</h2>
 
-            <!-- Cuerpo de la tarjeta -->
-            <div class="card-body">
-                <!-- Formulario para editar -->
-                <!-- enctype multipart para poder subir archivos (foto) -->
-                <form action="procesar_editar.php" method="POST" enctype="multipart/form-data">
-                    
-                    <!-- Campo oculto con el ID del emprendimiento -->
-                    <input type="hidden" name="id" value="<?php echo $datos['id']; ?>">
+    <form action="procesar_editar.php" method="POST" enctype="multipart/form-data" class="p-4 shadow rounded bg-white">
 
-                    <!-- Nombre del emprendimiento -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Nombre del Emprendimiento</label>
-                        <input type="text" class="form-control" name="nombre_emprendimiento"
-                               value="<?php echo $datos['nombre_emprendimiento']; ?>" required>
-                    </div>
-
-                    <!-- Categoría -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Categoría</label>
-                        <input type="text" class="form-control" name="categoria"
-                               value="<?php echo $datos['categoria']; ?>" required>
-                    </div>
-
-                    <!-- Descripción -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Descripción</label>
-                        <textarea class="form-control" name="descripcion" rows="4" required><?php echo $datos['descripcion']; ?></textarea>
-                    </div>
-
-                    <!-- Ubicación -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Ubicación</label>
-                        <input type="text" class="form-control" name="ubicacion"
-                               value="<?php echo $datos['ubicacion']; ?>" required>
-                    </div>
-
-                    <!-- Nombre del propietario -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Nombre del Propietario</label>
-                        <input type="text" class="form-control" name="nombre_propietario"
-                               value="<?php echo $datos['nombre_propietario']; ?>" required>
-                    </div>
-
-                    <!-- Teléfono -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Teléfono</label>
-                        <input type="text" class="form-control" name="telefono"
-                               value="<?php echo $datos['telefono']; ?>" required>
-                    </div>
-
-                    <!-- Correo -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Correo</label>
-                        <input type="email" class="form-control" name="correo"
-                               value="<?php echo $datos['correo']; ?>" required>
-                    </div>
-
-                    <!-- Foto actual (si existe) -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold d-block">Foto actual</label>
-                        <?php if (!empty($datos["foto"])): ?>
-                            <img src="<?php echo $datos['foto']; ?>" class="img-fluid mb-2" style="max-height: 200px;">
-                        <?php else: ?>
-                            <p class="text-muted">No hay foto registrada.</p>
-                        <?php endif; ?>
-                    </div>
-
-                    <!-- Subir una nueva foto (opcional) -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Cambiar foto (opcional)</label>
-                        <input type="file" class="form-control" name="foto">
-                    </div>
-
-                    <!-- Botones -->
-                    <div class="text-center">
-                        <!-- Botón para guardar cambios -->
-                        <button type="submit" class="btn btn-success px-4">
-                            <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
-                        </button>
-
-                        <!-- Botón para volver al panel -->
-                        <a href="panel.php" class="btn btn-secondary px-4 ms-2">
-                            <i class="fa-solid fa-arrow-left"></i> Volver al panel
-                        </a>
-                    </div>
-
-                </form>
-            </div>
+        <!-- Nombre -->
+        <div class="mb-3">
+            <label class="form-label">Nombre del Emprendimiento</label>
+            <input type="text" name="nombre_emprendimiento" class="form-control"
+            value="<?php echo $datos['nombre_emprendimiento']; ?>" required>
         </div>
-    </div>
 
-    <!-- Incluimos el footer -->
-    <?php include("includes/footer.php"); ?>
+        <!-- Categoría -->
+        <div class="mb-3">
+            <label class="form-label">Categoría</label>
+            <select name="categoria" class="form-control" required>
+                <option <?php if($datos['categoria']=="Gastronomía") echo "selected"; ?>>Gastronomía</option>
+                <option <?php if($datos['categoria']=="Artesanías") echo "selected"; ?>>Artesanías</option>
+                <option <?php if($datos['categoria']=="Tecnología") echo "selected"; ?>>Tecnología</option>
+                <option <?php if($datos['categoria']=="Servicios") echo "selected"; ?>>Servicios</option>
+                <option <?php if($datos['categoria']=="Ropa") echo "selected"; ?>>Ropa</option>
+                <option <?php if($datos['categoria']=="Otro") echo "selected"; ?>>Otro</option>
+            </select>
+        </div>
 
-    <!-- JS de Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Descripción -->
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea name="descripcion" class="form-control" required><?php echo $datos['descripcion']; ?></textarea>
+        </div>
+
+        <!-- Ubicación -->
+        <div class="mb-3">
+            <label class="form-label">Ubicación</label>
+            <input type="text" name="ubicacion" class="form-control" value="<?php echo $datos['ubicacion']; ?>" required>
+        </div>
+
+        <!-- Horarios -->
+        <div class="mb-3">
+            <label class="form-label">Horarios</label>
+            <textarea name="horarios" class="form-control"><?php echo $datos['horarios']; ?></textarea>
+        </div>
+
+        <!-- Servicios -->
+        <div class="mb-3">
+            <label class="form-label">Servicios Ofrecidos</label><br>
+
+            <input type="checkbox" name="servicios[]" value="Domicilios"
+                <?php if(in_array("Domicilios",$servicios_guardados)) echo "checked"; ?>> Domicilios <br>
+
+            <input type="checkbox" name="servicios[]" value="Pedidos"
+                <?php if(in_array("Pedidos",$servicios_guardados)) echo "checked"; ?>> Pedidos <br>
+
+            <input type="checkbox" name="servicios[]" value="Atención presencial"
+                <?php if(in_array("Atención presencial",$servicios_guardados)) echo "checked"; ?>> Atención presencial <br>
+
+            <input type="checkbox" name="servicios[]" value="Envíos nacionales"
+                <?php if(in_array("Envíos nacionales",$servicios_guardados)) echo "checked"; ?>> Envíos nacionales <br>
+
+            <label class="form-label mt-2">Servicios adicionales:</label>
+            <textarea name="servicios_extra" class="form-control"><?php echo $datos['servicios_extra']; ?></textarea>
+        </div>
+
+        <!-- Foto -->
+        <div class="mb-3">
+            <label class="form-label">Foto actual</label><br>
+            <img src="<?php echo $datos['foto']; ?>" width="200" class="rounded mb-3"><br>
+
+            <label class="form-label">Cambiar foto (opcional)</label>
+            <input type="file" name="foto" class="form-control">
+        </div>
+
+        <!-- Botón -->
+        <button class="btn btn-success w-100">Guardar Cambios</button>
+
+    </form>
+</div>
+
+<?php include("includes/footer.php"); ?>
+
 </body>
 </html>
-
-<?php
-// Cerramos la conexión a la base de datos
-$conexion->close();
-?>

@@ -3,96 +3,104 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Emprendimiento</title>
+    <title>Registrar Emprendimiento</title>
+    <link rel="stylesheet" href="styles.css">
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- Estilos propios -->
-    <link rel="stylesheet" href="styles.css">
 </head>
+<body>
 
-<body class="bg-light">
+<div class="container mt-5">
+    <h2 class="text-primary fw-bold text-center mb-4">Registrar Emprendimiento</h2>
 
-    <div class="container mt-5">
+    <form action="procesar_registro.php" method="POST" enctype="multipart/form-data" class="p-4 shadow rounded bg-white">
 
-        <div class="card shadow-lg">
-            <div class="card-header bg-primary text-white">
-                <h3 class="mb-0">Registrar Emprendimiento</h3>
-            </div>
-
-            <div class="card-body">
-
-                <form action="procesar_registro.php" method="POST" enctype="multipart/form-data">
-
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Nombre del Emprendimiento</label>
-                        <input type="text" class="form-control" name="nombre_emprendimiento" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Categoría</label>
-                        <select class="form-control" name="categoria" required>
-                            <option value="">Seleccione</option>
-                            <option value="Comida">Comida</option>
-                            <option value="Tecnología">Tecnología</option>
-                            <option value="Ropa">Ropa</option>
-                            <option value="Servicios">Servicios</option>
-                            <option value="Otro">Otro</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Descripción</label>
-                        <textarea class="form-control" name="descripcion" required></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Ubicación</label>
-                        <input type="text" class="form-control" name="ubicacion" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Nombre del Propietario</label>
-                        <input type="text" class="form-control" name="nombre_propietario" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Teléfono</label>
-                        <input type="number" class="form-control" name="telefono" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Correo Electrónico</label>
-                        <input type="email" class="form-control" name="correo" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Contraseña</label>
-                        <input type="password" class="form-control" name="contraseña" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Foto del emprendimiento</label>
-                        <input type="file" class="form-control" name="foto">
-                    </div>
-
-                    <button type="submit" class="btn btn-success w-100">Registrar</button>
-                </form>
-
-            </div>
+        <!-- Nombre del emprendimiento -->
+        <div class="mb-3">
+            <label class="form-label">Nombre del Emprendimiento</label>
+            <input type="text" name="nombre_emprendimiento" class="form-control" required>
         </div>
 
-    </div>
+        <!-- Categoría -->
+        <div class="mb-3">
+            <label class="form-label">Categoría</label>
+            <select name="categoria" class="form-control" required>
+                <option value="Gastronomía">Gastronomía</option>
+                <option value="Artesanías">Artesanías</option>
+                <option value="Tecnología">Tecnología</option>
+                <option value="Servicios">Servicios</option>
+                <option value="Ropa">Ropa</option>
+                <option value="Otro">Otro</option>
+            </select>
+        </div>
 
-    <?php include("includes/footer.php"); ?>
+        <!-- Descripción -->
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea name="descripcion" class="form-control" required></textarea>
+        </div>
 
-    <!-- Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Ubicación -->
+        <div class="mb-3">
+            <label class="form-label">Ubicación</label>
+            <input type="text" name="ubicacion" class="form-control" required>
+        </div>
+
+        <!-- Horarios (texto libre) -->
+        <div class="mb-3">
+            <label class="form-label">Horarios</label>
+            <textarea name="horarios" class="form-control" placeholder="Ejemplo: Lunes a sábado 8am-6pm"></textarea>
+        </div>
+
+        <!-- Servicios (checkbox + extra) -->
+        <div class="mb-3">
+            <label class="form-label">Servicios Ofrecidos</label><br>
+
+            <input type="checkbox" name="servicios[]" value="Domicilios"> Domicilios <br>
+            <input type="checkbox" name="servicios[]" value="Pedidos"> Pedidos <br>
+            <input type="checkbox" name="servicios[]" value="Atención presencial"> Atención presencial <br>
+            <input type="checkbox" name="servicios[]" value="Envíos nacionales"> Envíos nacionales <br>
+
+            <label class="form-label mt-2">Otros servicios (texto):</label>
+            <textarea name="servicios_extra" class="form-control"></textarea>
+        </div>
+
+        <!-- Datos del propietario -->
+        <div class="mb-3">
+            <label class="form-label">Nombre del Propietario</label>
+            <input type="text" name="nombre_propietario" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Teléfono</label>
+            <input type="number" name="telefono" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Correo</label>
+            <input type="email" name="correo" class="form-control" required>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input type="password" name="contraseña" class="form-control" required>
+        </div>
+
+        <!-- Foto -->
+        <div class="mb-3">
+            <label class="form-label">Foto del Negocio</label>
+            <input type="file" name="foto" class="form-control">
+        </div>
+
+        <!-- Botón registrar -->
+        <button class="btn btn-primary w-100">Registrar</button>
+
+    </form>
+</div>
+
+<?php include("includes/footer.php"); ?>
 
 </body>
 </html>

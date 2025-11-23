@@ -11,3 +11,29 @@ body {
 footer {
     margin-top: auto;
 }
+
+/* ==============================================
+   IMAGEN EN ver_mas.php (grande + centrada)
+   ============================================== */
+.foto-negocio {
+    width: 100%;
+    max-width: 450px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 15px;
+    display: block;
+    margin: auto;
+}
+
+/* Contenedor de texto más ordenado */
+.info-negocio p {
+    margin-bottom: 10px;
+}
+
+/* Alinear imagen y texto verticalmente (solo en pantallas grandes) */
+@media (min-width: 768px) {
+    .vermas-align {
+        display: flex;
+        align-items: center;
+    }
+}
