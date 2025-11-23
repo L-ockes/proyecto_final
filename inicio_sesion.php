@@ -1,78 +1,60 @@
-<?php
-// ==========================================
-// inicio_sesion.php
-// Procesa el inicio de sesión del usuario
-// ==========================================
+<?php include("includes/navbar.php"); ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión - Visita Quibdó</title>
 
-// 1. -----------------------------------------
-// Conectar con la base de datos
-// -----------------------------------------
-$servidor = "localhost";   // Servidor local en XAMPP
-$usuario = "root";         // Usuario por defecto
-$clave = "";               // Contraseña por defecto (vacía)
-$bd = "visita_quibdo";     // Nombre de tu base de datos
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-$conn = new mysqli($servidor, $usuario, $clave, $bd);
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-// Si la conexión falla
-if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
-}
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="styles.css">
+</head>
 
+<body class="bg-light">
 
-// 2. -----------------------------------------
-// Recibir datos del formulario enviado por POST
-// -----------------------------------------
-$correo = $_POST["correo"];
-$contraseña = $_POST["contraseña"];
+    <div class="container mt-5">
 
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Iniciar Sesión</h3>
+            </div>
 
-// 3. -----------------------------------------
-// Verificar si el correo existe en la BD
-// -----------------------------------------
-$sql = "SELECT * FROM emprendedores WHERE correo='$correo'";
-$resultado = $conn->query($sql);
+            <div class="card-body">
 
+                <form action="procesar_login.php" method="POST">
 
-// 4. -----------------------------------------
-// Validar si se encontró el correo
-// -----------------------------------------
-if ($resultado->num_rows > 0) {
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Correo Electrónico</label>
+                        <input type="email" class="form-control" name="correo" required>
+                    </div>
 
-    // Convertimos el resultado en un arreglo
-    $fila = $resultado->fetch_assoc();
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Contraseña</label>
+                        <input type="password" class="form-control" name="contraseña" required>
+                    </div>
 
-    // 5. -------------------------------------
-    // Validar contraseña ingresada con la BD
-    // -------------------------------------
-    if ($fila["contraseña"] === $contraseña) {
+                    <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
 
-        // Iniciar sesión correcta
-        session_start();
+                    <div class="text-center mt-3">
+                        <a href="registro.php">¿No tienes cuenta? Regístrate</a>
+                    </div>
 
-        // Guardamos datos del usuario para usar en el panel
-        $_SESSION["id"] = $fila["id_emprendedor"];
-        $_SESSION["nombre"] = $fila["nombre_emprendimiento"];
+                </form>
 
-        // Redirigir al panel del emprendedor
-        header("Location: panel.php");
-        exit();
+            </div>
+        </div>
 
-    } else {
-        // Contraseña incorrecta
-        echo "<h3 style='color:red;'>Contraseña incorrecta</h3>";
-        echo "<a href='inicio_sesion.html'>Intentar de nuevo</a>";
-    }
+    </div>
 
-} else {
-    // No existe el correo
-    echo "<h3 style='color:red;'>El correo no está registrado</h3>";
-    echo "<a href='inicio_sesion.html'>Volver al inicio</a>";
-}
+    <?php include("includes/footer.php"); ?>
 
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-// 6. -----------------------------------------
-// Cerrar conexión
-// -----------------------------------------
-$conn->close();
-?>
+</body>
+</html>

@@ -1,71 +1,98 @@
-<?php
-// ============================================
-// registro.php
-// Recibe los datos del registro y los inserta
-// en la base de datos.
-// ============================================
+<?php include("includes/navbar.php"); ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Emprendimiento</title>
 
-// 1. -----------------------------------------
-// Conexión con la base de datos
-// --------------------------------------------
-$servidor = "localhost";    // Servidor local
-$usuario = "root";          // Usuario de MySQL en XAMPP
-$clave = "";                // Contraseña por defecto
-$bd = "visita_quibdo";      // Nombre de tu base de datos
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-$conn = new mysqli($servidor, $usuario, $clave, $bd);
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-// Confirmar si hay error en la conexión
-if ($conn->connect_error) {
-    die("Error al conectar con la base de datos: " . $conn->connect_error);
-}
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="styles.css">
+</head>
 
-// 2. -----------------------------------------
-// Recibir datos del formulario (POST)
-// --------------------------------------------
-$nombre_emprendimiento = $_POST["nombre_emprendimiento"];
-$categoria = $_POST["categoria"];
-$descripcion = $_POST["descripcion"];
-$ubicacion = $_POST["ubicacion"];
-$nombre_propietario = $_POST["nombre_propietario"];
-$telefono = $_POST["telefono"];
-$correo = $_POST["correo"];
-$contraseña = $_POST["contraseña"];  // <--- CONTRASEÑA AGREGADA
+<body class="bg-light">
 
-// 3. -----------------------------------------
-// Validar si el correo ya existe
-// --------------------------------------------
-$verificar = "SELECT * FROM emprendedores WHERE correo='$correo'";
-$resultado = $conn->query($verificar);
+    <div class="container mt-5">
 
-if ($resultado->num_rows > 0) {
-    // Si ya existe el correo
-    echo "<h3 style='color:red;'>Este correo ya está registrado.</h3>";
-    echo "<a href='registro.html'>Volver al registro</a>";
-    exit();
-}
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Registrar Emprendimiento</h3>
+            </div>
 
-// 4. -----------------------------------------
-// Insertar datos en la tabla
-// --------------------------------------------
-$sql = "INSERT INTO emprendedores 
-        (nombre_emprendimiento, categoria, descripcion, ubicacion, nombre_propietario, telefono, correo, contraseña)
-        VALUES
-        ('$nombre_emprendimiento', '$categoria', '$descripcion', '$ubicacion', '$nombre_propietario', '$telefono', '$correo', '$contraseña')";
+            <div class="card-body">
 
-// 5. -----------------------------------------
-// Ejecutar la consulta e informar resultado
-// --------------------------------------------
-if ($conn->query($sql) === TRUE) {
-    echo "<h2>Registro exitoso</h2>";
-    echo "<p>El emprendimiento fue registrado correctamente.</p>";
-    echo "<a href='inicio_sesion.html'>Iniciar sesión</a>";
-} else {
-    echo "<h3 style='color:red;'>Error al registrar: " . $conn->error . "</h3>";
-}
+                <form action="procesar_registro.php" method="POST" enctype="multipart/form-data">
 
-// 6. -----------------------------------------
-// Cerrar conexión
-// --------------------------------------------
-$conn->close();
-?>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre del Emprendimiento</label>
+                        <input type="text" class="form-control" name="nombre_emprendimiento" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Categoría</label>
+                        <select class="form-control" name="categoria" required>
+                            <option value="">Seleccione</option>
+                            <option value="Comida">Comida</option>
+                            <option value="Tecnología">Tecnología</option>
+                            <option value="Ropa">Ropa</option>
+                            <option value="Servicios">Servicios</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Descripción</label>
+                        <textarea class="form-control" name="descripcion" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ubicación</label>
+                        <input type="text" class="form-control" name="ubicacion" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre del Propietario</label>
+                        <input type="text" class="form-control" name="nombre_propietario" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Teléfono</label>
+                        <input type="number" class="form-control" name="telefono" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Correo Electrónico</label>
+                        <input type="email" class="form-control" name="correo" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Contraseña</label>
+                        <input type="password" class="form-control" name="contraseña" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Foto del emprendimiento</label>
+                        <input type="file" class="form-control" name="foto">
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Registrar</button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <?php include("includes/footer.php"); ?>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
