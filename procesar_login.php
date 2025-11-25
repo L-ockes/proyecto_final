@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $contraseña = $_POST["contraseña"];
 
-    $sql = "SELECT * FROM emprendedores WHERE correo = '$correo' LIMIT 1";
+    $sql = "SELECT * FROM usuarios WHERE correo = '$correo' LIMIT 1";
     $resultado = $conexion->query($sql);
 
     if ($resultado && $resultado->num_rows == 1) {
@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($contraseña, $usuario["contraseña"])) {
 
             $_SESSION["id"]     = $usuario["id"];
-            $_SESSION["nombre"] = $usuario["nombre_propietario"];
+            $_SESSION["nombre"] = $usuario["nombre"];
             $_SESSION["rol"]    = $usuario["rol"];
             $_SESSION["foto"]   = $usuario["foto"];
 
