@@ -36,7 +36,9 @@
         <!-- Teléfono -->
         <div class="mb-3">
             <label class="form-label">Teléfono</label>
-            <input type="number" name="telefono" class="form-control" required>
+             <input type="tel" name="telefono" class="form-control"
+                   inputmode="tel" autocomplete="tel"
+                   pattern="[0-9\s()+-]{7,15}" required>
         </div>
 
         <!-- Contraseña -->

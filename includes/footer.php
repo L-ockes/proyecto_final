@@ -1,3 +1,5 @@
+<div class="footer-gap"></div>
+
 <footer class="bg-primary text-white mt-auto">
     <div class="container text-center py-3">
 

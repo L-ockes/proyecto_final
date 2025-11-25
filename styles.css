@@ -13,6 +13,10 @@ footer {
     margin-top: auto;
 }
 
+.footer-gap {
+    height: 2.5rem;
+}
+
 .foto-negocio {
     width: 100%;
     max-width: 450px;
@@ -22,7 +26,7 @@ footer {
     display: block;
     margin: auto;
 }
-/* ====== FOOTER SIEMPRE ABAJO SIN ESPACIOS BLANCOS ====== */
+/* ====== FOOTER ABAJO CON SEPARACIÓN SUPERIOR ====== */
 
 main {
     flex: 1;
