@@ -214,7 +214,11 @@ function mostrarContacto(string $valor, string $porDefecto = "No disponible")
                             </div>
 
                             <div class="col-md-4 mb-2">
-                                <a href="eliminar.php?id=<?php echo urlencode($datos['id']); ?>" class="btn btn-danger w-100">
+                                <a
+                                    href="eliminar.php?id=<?php echo urlencode($datos['id']); ?>"
+                                    class="btn btn-danger w-100"
+                                    onclick="return confirm('¿Estás seguro de que deseas eliminar tu emprendimiento?');"
+                                >
                                     <i class="fa-solid fa-trash"></i> Eliminar
                                 </a>
                             </div>
