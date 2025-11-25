@@ -1,6 +1,7 @@
-/* FOOTER SIEMPRE ABAJO */
 html, body {
     height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 body {
@@ -12,9 +13,6 @@ footer {
     margin-top: auto;
 }
 
-/* ==============================================
-   IMAGEN EN ver_mas.php (grande + centrada)
-   ============================================== */
 .foto-negocio {
     width: 100%;
     max-width: 450px;
@@ -24,16 +22,38 @@ footer {
     display: block;
     margin: auto;
 }
+/* ====== FOOTER SIEMPRE ABAJO SIN ESPACIOS BLANCOS ====== */
 
-/* Contenedor de texto más ordenado */
-.info-negocio p {
-    margin-bottom: 10px;
+main {
+    flex: 1;
+}
+/* 💠 HOVER estilo Crunchyroll (fondo suave + transición) */
+.navbar .nav-link,
+.navbar .dropdown-toggle {
+    color: #ffffff !important;
+    padding: 8px 15px;
+    border-radius: 6px;
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Alinear imagen y texto verticalmente (solo en pantallas grandes) */
-@media (min-width: 768px) {
-    .vermas-align {
-        display: flex;
-        align-items: center;
-    }
+/* Fondo suave al pasar el mouse */
+.navbar .nav-link:hover,
+.navbar .dropdown-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.20) !important;
+    color: #ffffff !important;
 }
+
+/* 💠 Ítem ACTIVO (resalta la página actual) */
+.navbar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.35) !important;
+    font-weight: 700 !important;
+    border-radius: 6px;
+}
+
+/* 💠 Hover para elementos del menú desplegable */
+.dropdown-menu .dropdown-item:hover {
+    background-color: rgba(0, 123, 255, 0.15) !important;
+    border-radius: 5px;
+}
+
+

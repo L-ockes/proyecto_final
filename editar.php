@@ -8,20 +8,20 @@ if (!isset($_SESSION["id"])) {
 }
 
 $conexion = new mysqli("localhost", "root", "", "visita_quibdo");
-
 if ($conexion->connect_error) {
     die("Error: " . $conexion->connect_error);
 }
 
 $id = $_SESSION["id"];
 
-// Obtener datos actuales
-$sql = "SELECT * FROM emprendedores WHERE id='$id'";
+// Obtener datos actuales del emprendimiento
+$sql       = "SELECT * FROM emprendedores WHERE id='$id'";
 $resultado = $conexion->query($sql);
-$datos = $resultado->fetch_assoc();
+$datos     = $resultado->fetch_assoc();
 
-// Convertir servicios en arreglo para marcar checkbox
-$servicios_guardados = explode(", ", $datos["servicios"]);
+// Obtener categorías y servicios desde la BD
+$categorias  = $conexion->query("SELECT nombre_categoria FROM categorias ORDER BY nombre_categoria ASC");
+$serviciosBD = $conexion->query("SELECT nombre_servicio FROM servicios ORDER BY nombre_servicio ASC");
 ?>
 
 <!DOCTYPE html>
@@ -47,20 +47,29 @@ $servicios_guardados = explode(", ", $datos["servicios"]);
         <div class="mb-3">
             <label class="form-label">Nombre del Emprendimiento</label>
             <input type="text" name="nombre_emprendimiento" class="form-control"
-            value="<?php echo $datos['nombre_emprendimiento']; ?>" required>
+                   value="<?php echo $datos['nombre_emprendimiento']; ?>" required>
         </div>
 
-        <!-- Categoría -->
+        <!-- Categoría dinámica -->
         <div class="mb-3">
             <label class="form-label">Categoría</label>
-            <select name="categoria" class="form-control" required>
-                <option <?php if($datos['categoria']=="Gastronomía") echo "selected"; ?>>Gastronomía</option>
-                <option <?php if($datos['categoria']=="Artesanías") echo "selected"; ?>>Artesanías</option>
-                <option <?php if($datos['categoria']=="Tecnología") echo "selected"; ?>>Tecnología</option>
-                <option <?php if($datos['categoria']=="Servicios") echo "selected"; ?>>Servicios</option>
-                <option <?php if($datos['categoria']=="Ropa") echo "selected"; ?>>Ropa</option>
-                <option <?php if($datos['categoria']=="Otro") echo "selected"; ?>>Otro</option>
+
+            <select name="categoria" id="categoriaSelect" class="form-control" required>
+                <?php if ($categorias && $categorias->num_rows > 0): ?>
+                    <?php while ($cat = $categorias->fetch_assoc()): ?>
+                        <option value="<?php echo $cat['nombre_categoria']; ?>"
+                            <?php if ($datos['categoria'] == $cat['nombre_categoria']) echo "selected"; ?>>
+                            <?php echo $cat['nombre_categoria']; ?>
+                        </option>
+                    <?php endwhile; ?>
+                <?php endif; ?>
+
+                <option value="Otro">Otro</option>
             </select>
+
+            <!-- Campo nueva categoría -->
+            <input type="text" name="categoria_nueva" id="categoriaNueva" class="form-control mt-2"
+                   placeholder="Escribe la nueva categoría" style="display:none;">
         </div>
 
         <!-- Descripción -->
@@ -72,7 +81,8 @@ $servicios_guardados = explode(", ", $datos["servicios"]);
         <!-- Ubicación -->
         <div class="mb-3">
             <label class="form-label">Ubicación</label>
-            <input type="text" name="ubicacion" class="form-control" value="<?php echo $datos['ubicacion']; ?>" required>
+            <input type="text" name="ubicacion" class="form-control"
+                   value="<?php echo $datos['ubicacion']; ?>" required>
         </div>
 
         <!-- Horarios -->
@@ -81,24 +91,29 @@ $servicios_guardados = explode(", ", $datos["servicios"]);
             <textarea name="horarios" class="form-control"><?php echo $datos['horarios']; ?></textarea>
         </div>
 
-        <!-- Servicios -->
+        <!-- Servicio principal -->
         <div class="mb-3">
-            <label class="form-label">Servicios Ofrecidos</label><br>
+            <label class="form-label">Servicio Ofrecido</label>
 
-            <input type="checkbox" name="servicios[]" value="Domicilios"
-                <?php if(in_array("Domicilios",$servicios_guardados)) echo "checked"; ?>> Domicilios <br>
+            <select name="servicio" id="servicioSelect" class="form-control" required>
+                <?php if ($serviciosBD && $serviciosBD->num_rows > 0): ?>
+                    <?php while ($srv = $serviciosBD->fetch_assoc()): ?>
+                        <?php
+                            $nombreSrv = $srv['nombre_servicio'];
+                            $selected  = ($datos['servicios'] == $nombreSrv) ? "selected" : "";
+                        ?>
+                        <option value="<?php echo $nombreSrv; ?>" <?php echo $selected; ?>>
+                            <?php echo $nombreSrv; ?>
+                        </option>
+                    <?php endwhile; ?>
+                <?php endif; ?>
 
-            <input type="checkbox" name="servicios[]" value="Pedidos"
-                <?php if(in_array("Pedidos",$servicios_guardados)) echo "checked"; ?>> Pedidos <br>
+                <option value="Otro">Otro</option>
+            </select>
 
-            <input type="checkbox" name="servicios[]" value="Atención presencial"
-                <?php if(in_array("Atención presencial",$servicios_guardados)) echo "checked"; ?>> Atención presencial <br>
-
-            <input type="checkbox" name="servicios[]" value="Envíos nacionales"
-                <?php if(in_array("Envíos nacionales",$servicios_guardados)) echo "checked"; ?>> Envíos nacionales <br>
-
-            <label class="form-label mt-2">Servicios adicionales:</label>
-            <textarea name="servicios_extra" class="form-control"><?php echo $datos['servicios_extra']; ?></textarea>
+            <!-- Campo nuevo servicio -->
+            <input type="text" name="servicio_nuevo" id="servicioNuevo"
+                   class="form-control mt-2" placeholder="Escribe un nuevo servicio" style="display:none;">
         </div>
 
         <!-- Foto -->
@@ -114,9 +129,70 @@ $servicios_guardados = explode(", ", $datos["servicios"]);
         <button class="btn btn-success w-100">Guardar Cambios</button>
 
     </form>
+    <script>
+function primeraMayuscula(texto) {
+    if (!texto) return "";
+    return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+}
+
+// Campos que deben normalizarse automáticamente
+const campos = [
+    "nombre_emprendimiento",
+    "descripcion",
+    "ubicacion",
+    "horarios",
+    "nombre_propietario",
+    "categoriaNueva",
+    "servicioNuevo"
+];
+
+// Activar normalización en cada input
+campos.forEach(id => {
+    let campo = document.getElementsByName(id)[0] || document.getElementById(id);
+    if (campo) {
+        campo.addEventListener("input", function () {
+            this.value = primeraMayuscula(this.value);
+        });
+    }
+});
+</script>
+
+    <script>
+function primeraMayuscula(texto) {
+    if (!texto) return "";
+    return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+}
+
+// Nueva categoría
+document.getElementById("categoriaNueva").addEventListener("input", function () {
+    this.value = primeraMayuscula(this.value);
+});
+
+// Nuevo servicio
+document.getElementById("servicioNuevo").addEventListener("input", function () {
+    this.value = primeraMayuscula(this.value);
+});
+</script>
+
 </div>
 
 <?php include("includes/footer.php"); ?>
+
+<!-- Scripts para "Otro" -->
+<script>
+// Categoría: mostrar input nueva categoría
+document.getElementById('categoriaSelect').addEventListener('change', function () {
+    let input = document.getElementById('categoriaNueva');
+    input.style.display = (this.value === 'Otro') ? 'block' : 'none';
+});
+
+// Servicio: mostrar input nuevo servicio
+document.getElementById('servicioSelect').addEventListener('change', function () {
+    let input = document.getElementById('servicioNuevo');
+    input.style.display = (this.value === 'Otro') ? 'block' : 'none';
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

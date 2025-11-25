@@ -7,38 +7,46 @@ if ($conexion->connect_error) {
     die("Error de conexión: " . $conexion->connect_error);
 }
 
-$correo = $_POST['correo'];
-$contraseña = $_POST['contraseña'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-$sql = "SELECT * FROM emprendedores WHERE correo = '$correo'";
-$resultado = $conexion->query($sql);
+   $correo = strtolower(trim($_POST['correo']));
+   $correo = $conexion->real_escape_string($correo);
 
-if ($resultado->num_rows > 0) {
-    $fila = $resultado->fetch_assoc();
+    $contraseña = $_POST["contraseña"];
 
-    if ($fila["contraseña"] === $contraseña) {
+    $sql = "SELECT * FROM emprendedores WHERE correo = '$correo' LIMIT 1";
+    $resultado = $conexion->query($sql);
 
-        // Guardar sesión
-        $_SESSION["id"] = $fila["id"];
-        $_SESSION["nombre"] = $fila["nombre_propietario"];
+    if ($resultado && $resultado->num_rows == 1) {
 
-        echo "<script>
-                alert('Sesión iniciada correctamente.');
-                window.location.href = 'index.php';
-              </script>";
-    } else {
-        echo "<script>
-                alert('Contraseña incorrecta.');
-                window.location.href = 'inicio_sesion.php';
-              </script>";
-    }
+        $usuario = $resultado->fetch_assoc();
 
-} else {
-    echo "<script>
-            alert('El correo no está registrado.');
-            window.location.href = 'inicio_sesion.php';
-          </script>";
+        // Usar password_verify()
+        if (password_verify($contraseña, $usuario["contraseña"])) {
+
+            $_SESSION["id"]     = $usuario["id"];
+            $_SESSION["nombre"] = $usuario["nombre_propietario"];
+            $_SESSION["rol"]    = $usuario["rol"];
+            $_SESSION["foto"]   = $usuario["foto"];
+
+
+            // Enviar según el rol
+            if ($_SESSION["rol"] === "admin") {
+                 header("Location: panel_admin.php");
+            } else {
+                 header("Location: panel.php");
+
 }
+exit();
 
-$conexion->close();
+
+        } else {
+            echo "<script>alert('Contraseña incorrecta'); history.back();</script>";
+            exit();
+        }
+    } else {
+        echo "<script>alert('No existe un usuario con ese correo'); history.back();</script>";
+        exit();
+    }
+}
 ?>

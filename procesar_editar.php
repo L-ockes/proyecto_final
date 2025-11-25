@@ -7,75 +7,121 @@ if (!isset($_SESSION["id"])) {
     exit();
 }
 
-// Conexión
 $conexion = new mysqli("localhost", "root", "", "visita_quibdo");
-
 if ($conexion->connect_error) {
     die("Error en la conexión: " . $conexion->connect_error);
 }
 
 $id = $_SESSION["id"];
 
-// =======================
-// 1. Obtener datos del formulario
-// =======================
+// Función para normalizar texto
+function normalizarTexto($txt) {
+    $txt = trim($txt);
+    return ($txt !== "") ? ucfirst(strtolower($txt)) : "";
+}
 
-$nombre_emprendimiento = $_POST['nombre_emprendimiento'];
-$categoria = $_POST['categoria'];
-$descripcion = $_POST['descripcion'];
-$ubicacion = $_POST['ubicacion'];
-$horarios = $_POST['horarios'];
+// =========================
+// 1. RECIBIR DATOS
+// =========================
+$nombre_emprendimiento = normalizarTexto($_POST['nombre_emprendimiento']);
+$categoria             = $_POST['categoria'];
+$categoria_nueva       = normalizarTexto($_POST['categoria_nueva'] ?? "");
 
-// Convertir servicios marcados en texto
-$servicios = isset($_POST["servicios"]) ? implode(", ", $_POST["servicios"]) : "";
-$servicios_extra = $_POST["servicios_extra"];
+$descripcion           = normalizarTexto($_POST['descripcion']);
+$ubicacion             = normalizarTexto($_POST['ubicacion']);
+$horarios              = normalizarTexto($_POST['horarios']);
 
-$nombre_propietario = $_POST['nombre_propietario'] ?? "";
-$telefono = $_POST['telefono'] ?? "";
-$correo = $_POST['correo'] ?? "";
-$contraseña = $_POST['contraseña'] ?? "";  // (si lo estás editando aquí)
+$servicio              = $_POST["servicio"];
+$servicio_nuevo        = normalizarTexto($_POST["servicio_nuevo"] ?? "");
 
+$correo                = $_POST["correo"] ?? "";
+$telefono              = $_POST["telefono"] ?? "";
 
-// =======================
-// 2. Manejo de la foto
-// =======================
+// =========================
+// 2. VALIDACIONES AVANZADAS
+// =========================
 
-// Primero obtenemos la foto actual
-$sqlFoto = "SELECT foto FROM emprendedores WHERE id='$id'";
+// Validar nombre duplicado (excepto el propio)
+$nombreLimpio = $conexion->real_escape_string($nombre_emprendimiento);
+$queryNombre = $conexion->query("SELECT id FROM emprendedores WHERE nombre_emprendimiento = '$nombreLimpio' AND id != '$id'");
+
+if ($queryNombre->num_rows > 0) {
+    echo "<script>alert('El nombre del emprendimiento ya existe'); history.back();</script>";
+    exit();
+}
+
+// Validar correo duplicado
+if (!empty($correo)) {
+    $correoLimpio = $conexion->real_escape_string($correo);
+    $queryCorreo = $conexion->query("SELECT id FROM emprendedores WHERE correo = '$correoLimpio' AND id != '$id'");
+
+    if ($queryCorreo->num_rows > 0) {
+        echo "<script>alert('Ese correo pertenece a otro emprendimiento'); history.back();</script>";
+        exit();
+    }
+}
+
+// =========================
+// 3. PROCESAR CATEGORÍA NUEVA
+// =========================
+if ($categoria === "Otro" && !empty($categoria_nueva)) {
+    $categoria_nueva = $conexion->real_escape_string($categoria_nueva);
+
+    $checkCat = $conexion->query("SELECT id FROM categorias WHERE nombre_categoria = '$categoria_nueva'");
+    if ($checkCat->num_rows == 0) {
+        $conexion->query("INSERT INTO categorias (nombre_categoria) VALUES ('$categoria_nueva')");
+    }
+
+    $categoria = $categoria_nueva;
+}
+
+// =========================
+// 4. PROCESAR SERVICIO NUEVO
+// =========================
+if ($servicio === "Otro" && !empty($servicio_nuevo)) {
+    $servicio_nuevo = $conexion->real_escape_string($servicio_nuevo);
+
+    $checkSrv = $conexion->query("SELECT id FROM servicios WHERE nombre_servicio = '$servicio_nuevo'");
+    if ($checkSrv->num_rows == 0) {
+        $conexion->query("INSERT INTO servicios (nombre_servicio) VALUES ('$servicio_nuevo')");
+    }
+
+    $servicios = $servicio_nuevo;
+} else {
+    $servicios = $conexion->real_escape_string($servicio);
+}
+
+// =========================
+// 5. FOTO
+// =========================
+$sqlFoto   = "SELECT foto FROM emprendedores WHERE id='$id'";
 $resultFoto = $conexion->query($sqlFoto);
-$datosFoto = $resultFoto->fetch_assoc();
+$datosFoto  = $resultFoto->fetch_assoc();
 $fotoActual = $datosFoto["foto"];
 
-$nuevaFoto = $fotoActual; // Por defecto, conservar la foto actual
+$nuevaFoto = $fotoActual; // Por defecto
 
-// Si subió una nueva imagen
 if (isset($_FILES["foto"]) && $_FILES["foto"]["error"] === 0) {
-
-    // Crear nombre único
     $nombreImagen = time() . "_" . basename($_FILES["foto"]["name"]);
-    $rutaDestino = "fotos/" . $nombreImagen;
+    $rutaDestino  = "fotos/" . $nombreImagen;
 
-    // Mover imagen
     if (move_uploaded_file($_FILES["foto"]["tmp_name"], $rutaDestino)) {
         $nuevaFoto = $rutaDestino;
     }
 }
 
-
-// =======================
-// 3. Actualizar datos en la base de datos
-// =======================
-
+// =========================
+// 6. ACTUALIZAR BD
+// =========================
 $sql = "UPDATE emprendedores SET
         nombre_emprendimiento = '$nombre_emprendimiento',
-        categoria = '$categoria',
-        descripcion = '$descripcion',
-        ubicacion = '$ubicacion',
-        horarios = '$horarios',
-        servicios = '$servicios',
-        servicios_extra = '$servicios_extra',
-        foto = '$nuevaFoto'
-        WHERE id = '$id'";
+        categoria            = '$categoria',
+        descripcion          = '$descripcion',
+        ubicacion            = '$ubicacion',
+        horarios             = '$horarios',
+        servicios            = '$servicios',
+        foto                 = '$nuevaFoto'
+        WHERE id             = '$id'";
 
 if ($conexion->query($sql)) {
     echo "<script>

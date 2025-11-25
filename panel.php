@@ -81,7 +81,7 @@ $datos = $resultado->fetch_assoc();
 
         <!-- Título principal -->
         <h2 class="text-primary fw-bold mb-4 text-center">
-            Bienvenido al Panel de Administración, <?php echo $_SESSION["nombre"]; ?>
+            Bienvenido al Panel del Emprendimiento, <?php echo $_SESSION["nombre"]; ?>
         </h2>
 
         <!-- Fila principal -->
@@ -122,7 +122,7 @@ $datos = $resultado->fetch_assoc();
                     </h4>
 
                     <!-- Datos -->
-                    <p><strong>Nombre:</strong> <?php echo $datos["nombre_emprendimiento"]; ?></p>
+                    <p><strong>Emprendimiento:</strong> <?php echo $datos["nombre_emprendimiento"]; ?></p>
                     <p><strong>Categoría:</strong> <?php echo $datos["categoria"]; ?></p>
                     <p><strong>Ubicación:</strong> <?php echo $datos["ubicacion"]; ?></p>
                     <p><strong>Propietario:</strong> <?php echo $datos["nombre_propietario"]; ?></p>
@@ -156,6 +156,12 @@ $datos = $resultado->fetch_assoc();
                                 <i class="fa-solid fa-pen"></i> Editar
                             </a>
                         </div>
+
+                        <div class="col-md-4 mb-2">
+                            <a href="cambiar_contraseña.php" class="btn btn-warning w-100">
+                                  Cambiar Contraseña
+                            </a>
+                        </div>    
 
                         <div class="col-md-4 mb-2">
                             <a href="eliminar.php?id=<?php echo $datos['id']; ?>" class="btn btn-danger w-100">

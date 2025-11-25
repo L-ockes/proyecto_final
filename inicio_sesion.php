@@ -1,60 +1,49 @@
-<?php include("includes/navbar.php"); ?>
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Iniciar Sesión - Visita Quibdó</title>
-
-    <!-- Bootstrap -->
+    <title>Inicio de Sesión</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- Estilos propios -->
-    <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="bg-light">
+<body class="d-flex flex-column min-vh-100">
 
-    <div class="container mt-5">
+<?php include("includes/navbar.php"); ?>
 
-        <div class="card shadow-lg">
-            <div class="card-header bg-primary text-white">
-                <h3 class="mb-0">Iniciar Sesión</h3>
-            </div>
+<div class="container mt-5 flex-grow-1">
+    <h2 class="text-center text-primary fw-bold">Iniciar Sesión</h2>
 
-            <div class="card-body">
+    <form action="procesar_login.php" method="POST" 
+          class="p-4 bg-white shadow rounded mt-4" 
+          style="max-width: 450px; margin: auto;">
 
-                <form action="procesar_login.php" method="POST">
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Correo Electrónico</label>
-                        <input type="email" class="form-control" name="correo" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Contraseña</label>
-                        <input type="password" class="form-control" name="contraseña" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
-
-                    <div class="text-center mt-3">
-                        <a href="registro.php">¿No tienes cuenta? Regístrate</a>
-                    </div>
-
-                </form>
-
-            </div>
+        <div class="mb-3">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" name="correo" class="form-control" required>
         </div>
 
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input type="password" name="contraseña" class="form-control" required>
+        </div>
 
-    <?php include("includes/footer.php"); ?>
+        <button class="btn btn-primary w-100">Ingresar</button>
 
-    <!-- Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <p class="text-center mt-3">
+            ¿No tienes cuenta?
+            <a href="registro.php">Regístrate aquí</a>
+        </p>
 
+    </form>
+</div>
+
+<?php include("includes/footer.php"); ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
