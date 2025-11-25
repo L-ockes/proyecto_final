@@ -8,10 +8,23 @@ if ($conexion->connect_error) {
     die("Error de conexión: " . $conexion->connect_error);
 }
 
-$id = $_GET["id"];
-$sql = "SELECT * FROM emprendedores WHERE id='$id'";
-$resultado = $conexion->query($sql);
+$id = (int) ($_GET["id"] ?? 0);
+
+$sql = "SELECT e.*, u.nombre AS usuario_nombre, u.telefono AS usuario_telefono, u.correo AS usuario_correo
+        FROM emprendedores e
+        JOIN usuarios u ON e.id = u.id
+        WHERE e.id = ?";
+
+$stmt = $conexion->prepare($sql);
+if (!$stmt) {
+    die("Error al preparar la consulta: " . $conexion->error);
+}
+
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$resultado = $stmt->get_result();
 $fila = $resultado->fetch_assoc();
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -89,11 +102,11 @@ $fila = $resultado->fetch_assoc();
                 </p>
             <?php endif; ?>
 
-            <p><strong>Propietario:</strong> <?php echo $fila["nombre_propietario"]; ?></p>
-            <p><strong>Teléfono:</strong> <?php echo $fila["telefono"]; ?></p>
-            <p><strong>Correo:</strong> <?php echo $fila["correo"]; ?></p>
+            <p><strong>Propietario:</strong> <?php echo htmlspecialchars($fila["usuario_nombre"] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
+            <p><strong>Teléfono:</strong> <?php echo htmlspecialchars($fila["usuario_telefono"] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
+            <p><strong>Correo:</strong> <?php echo htmlspecialchars($fila["usuario_correo"] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
 
-            <a href="https://wa.me/57<?php echo $fila['telefono']; ?>" 
+            <a href="https://wa.me/57<?php echo htmlspecialchars($fila['usuario_telefono'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                class="btn btn-success w-100 mt-3">
                <i class="fa-brands fa-whatsapp"></i> Contactar por WhatsApp
             </a>

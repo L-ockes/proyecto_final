@@ -12,9 +12,14 @@ function limpiar($txt) {
 
 $nombre = limpiar($_POST["nombre"]);
 $correo = $conexion->real_escape_string($_POST["correo"]);
-$telefono = $conexion->real_escape_string($_POST["telefono"]);
+$telefono = preg_replace('/\D+/', '', $_POST["telefono"] ?? '');
 $pass1 = $_POST["contraseña"];
 $pass2 = $_POST["contraseña2"];
+
+if (strlen($telefono) !== 10) {
+    echo "<script>alert('El teléfono debe tener exactamente 10 dígitos'); history.back();</script>";
+    exit();
+}
 
 // Validar contraseñas
 if ($pass1 !== $pass2) {
@@ -32,13 +37,6 @@ if (!preg_match("/^(?=.*[A-Za-z])(?=.*\d).{6,}$/", $pass1)) {
 $checkCorreo = $conexion->query("SELECT id FROM usuarios WHERE correo='$correo'");
 if ($checkCorreo->num_rows > 0) {
     echo "<script>alert('El correo ya está registrado'); history.back();</script>";
-    exit();
-}
-
-// Validar teléfono único
-$checkTel = $conexion->query("SELECT id FROM usuarios WHERE telefono='$telefono'");
-if ($checkTel->num_rows > 0) {
-    echo "<script>alert('El teléfono ya está registrado'); history.back();</script>";
     exit();
 }
 

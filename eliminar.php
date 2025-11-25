@@ -17,41 +17,54 @@ if ($conexion->connect_error) {
 }
 
 // Obtenemos el id del usuario logueado
-$idUsuario = $_SESSION["id"];
+$idUsuario = (int) $_SESSION["id"];
 
 // Traemos los datos del emprendimiento para saber si tiene foto
-$sqlSelect = "SELECT foto FROM emprendedores WHERE id = '$idUsuario'";
-$resultado = $conexion->query($sqlSelect);
+$stmtSelect = $conexion->prepare("SELECT foto FROM emprendedores WHERE id = ? LIMIT 1");
+
+if (!$stmtSelect) {
+    die("No se pudo preparar la consulta de búsqueda de emprendimiento.");
+}
+
+$stmtSelect->bind_param("i", $idUsuario);
+$stmtSelect->execute();
+$resultado = $stmtSelect->get_result();
 
 // Si no hay fila, mostramos mensaje
 if ($resultado->num_rows == 0) {
+    $stmtSelect->close();
     die("No se encontró el emprendimiento a eliminar.");
 }
 
 $datos = $resultado->fetch_assoc();
 $foto = $datos["foto"];
+$stmtSelect->close();
 
 // Eliminamos el registro de la base de datos
-$sqlDelete = "DELETE FROM emprendedores WHERE id = '$idUsuario'";
+$stmtDelete = $conexion->prepare("DELETE FROM emprendedores WHERE id = ? LIMIT 1");
 
-if ($conexion->query($sqlDelete) === TRUE) {
+if (!$stmtDelete) {
+    die("No se pudo preparar la eliminación del emprendimiento.");
+}
+
+$stmtDelete->bind_param("i", $idUsuario);
+
+if ($stmtDelete->execute()) {
 
     // Si hay foto y el archivo existe, la podemos borrar (opcional)
     if (!empty($foto) && file_exists($foto)) {
         // unlink($foto); // Descomentar si quieres borrar la foto físicamente
     }
 
-    // Cerramos sesión porque ya no tiene emprendimiento
-    session_unset();
-    session_destroy();
-
     echo "<script>
-            alert('Tu emprendimiento ha sido eliminado.');
-            window.location.href = 'index.php';
+            alert('Tu emprendimiento ha sido eliminado, tu cuenta permanece activa.');
+            window.location.href = 'panel.php';
           </script>";
 } else {
-    echo "Error al eliminar: " . $conexion->error;
+    echo "Error al eliminar: " . $stmtDelete->error;
 }
+
+$stmtDelete->close();
 
 // Cerramos conexión
 $conexion->close();

@@ -30,13 +30,19 @@
         <!-- Correo -->
         <div class="mb-3">
             <label class="form-label">Correo</label>
-            <input type="email" name="correo" class="form-control" required>
+            <input type="email" name="correo" class="form-control" autocomplete="email" required>
         </div>
 
         <!-- Teléfono -->
         <div class="mb-3">
             <label class="form-label">Teléfono</label>
-            <input type="number" name="telefono" class="form-control" required>
+            <input type="tel" name="telefono" class="form-control"
+                   inputmode="numeric"
+                   pattern="\d{10}"
+                   maxlength="10"
+                   oninput="this.value=this.value.replace(/\D/g,'').slice(0,10);"
+                   placeholder="Ej: 3123456789"
+                   required>
         </div>
 
         <!-- Contraseña -->

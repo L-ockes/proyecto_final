@@ -35,14 +35,18 @@ if (session_status() === PHP_SESSION_NONE) {
 
                 <?php if (!isset($_SESSION["id"])): ?>
 
-                    <!-- Iniciar sesión + registrar SOLO si NO ha iniciado sesión -->
-                    <li class="nav-item">
-                        <a class="btn btn-light btn-sm me-2" href="inicio_sesion.php">Iniciar sesión</a>
-                    </li>
+                    <?php $pagina_actual = basename($_SERVER['PHP_SELF']); ?>
 
-                    <li class="nav-item">
-                        <a class="btn btn-outline-light btn-sm" href="registro.php">Registrarse</a>
-                    </li>
+                    <!-- Iniciar sesión + registrar SOLO si NO ha iniciado sesión y no estamos en esas páginas -->
+                    <?php if (!in_array($pagina_actual, ['inicio_sesion.php', 'registro.php'])): ?>
+                        <li class="nav-item">
+                            <a class="btn btn-light btn-sm me-2" href="inicio_sesion.php">Iniciar sesión</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light btn-sm" href="registro.php">Registrarse</a>
+                        </li>
+                    <?php endif; ?>
 
                 <?php else: ?>
 
@@ -70,8 +74,12 @@ if (session_status() === PHP_SESSION_NONE) {
                             <?php if ($_SESSION["rol"] === "admin"): ?>
                                 <li><a class="dropdown-item" href="panel_admin.php">Panel Administrador</a></li>
                             <?php else: ?>
-                                <li><a class="dropdown-item" href="panel.php">Mi Panel</a></li>
+                                <li><a class="dropdown-item" href="panel.php">Mi Emprendimiento</a></li>
+                                <li><a class="dropdown-item" href="crear_emprendimiento.php">Registrar Emprendimiento</a></li>
                             <?php endif; ?>
+
+                            <!-- Acceso a edición de perfil -->
+                            <li><a class="dropdown-item" href="editar_usuario.php">Editar Perfil</a></li>
 
                             <li><hr class="dropdown-divider"></li>
 
